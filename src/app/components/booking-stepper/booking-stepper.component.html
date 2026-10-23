@@ -1,0 +1,291 @@
+<div class="booking-container">
+  <mat-card class="booking-card">
+    <mat-card-header>
+      <mat-card-title>Book Your Appointment</mat-card-title>
+      <mat-card-subtitle>Step {{ currentStep + 1 }} of 4</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="error-message">
+        <strong>Error:</strong> {{ errorMessage }}
+      </div>
+
+      <!-- Success Message -->
+      <div *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+      </div>
+
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <!-- Step 0: Service Selection -->
+      <div *ngIf="currentStep === 0 && !isLoading" class="step-content">
+        <h2>Select Your Service</h2>
+
+        <!-- Service Category Selection -->
+        <div class="selection-section">
+          <h3>1. Service Category</h3>
+          <div *ngIf="categories.length === 0" class="empty-state">
+            No categories available
+          </div>
+          <mat-radio-group *ngIf="categories.length > 0" [(ngModel)]="selectedCategory">
+            <mat-radio-button
+              *ngFor="let category of categories"
+              [value]="category"
+              (change)="onCategorySelected(category)"
+              class="radio-option">
+              {{ category.name }}
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <!-- Product Selection -->
+        <div class="selection-section" *ngIf="selectedCategory && products.length > 0">
+          <h3>2. Product</h3>
+          <mat-radio-group [(ngModel)]="selectedProduct">
+            <mat-radio-button
+              *ngFor="let product of products"
+              [value]="product"
+              (change)="onProductSelected(product)"
+              class="radio-option">
+              {{ product.name }}
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <!-- Service Type Selection -->
+        <div class="selection-section" *ngIf="selectedProduct && serviceTypes.length > 0">
+          <h3>3. Service Type</h3>
+          <mat-radio-group [(ngModel)]="selectedServiceType">
+            <mat-radio-button
+              *ngFor="let serviceType of serviceTypes"
+              [value]="serviceType"
+              (change)="onServiceTypeSelected(serviceType)"
+              class="radio-option">
+              {{ serviceType.name }}
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <!-- Service Reason Selection (Optional) -->
+        <div class="selection-section" *ngIf="selectedServiceType && serviceReasons.length > 0">
+          <h3>4. Service Reason (Optional)</h3>
+          <mat-radio-group [(ngModel)]="selectedServiceReason">
+            <mat-radio-button
+              *ngFor="let reason of serviceReasons"
+              [value]="reason"
+              (change)="onServiceReasonSelected(reason)"
+              class="radio-option">
+              {{ reason.description }}
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <!-- Document Guidance -->
+        <div class="guidance-section" *ngIf="documentGuidance">
+          <mat-card class="guidance-card">
+            <mat-card-header>
+              <mat-card-title>Required Documents</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              {{ documentGuidance }}
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Navigation -->
+        <div class="step-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="proceedToCustomerDetails()"
+            [disabled]="!selectedServiceType || isLoading">
+            Next: Customer Details
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 1: Customer Details -->
+      <div *ngIf="currentStep === 1 && !isLoading" class="step-content">
+        <h2>Your Details</h2>
+
+        <form [formGroup]="customerDetailsForm">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" placeholder="Enter your first name">
+            <mat-error *ngIf="customerDetailsForm.get('firstName')?.hasError('required')">
+              First name is required
+            </mat-error>
+            <mat-error *ngIf="customerDetailsForm.get('firstName')?.hasError('minlength')">
+              First name must be at least 2 characters
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" placeholder="Enter your last name">
+            <mat-error *ngIf="customerDetailsForm.get('lastName')?.hasError('required')">
+              Last name is required
+            </mat-error>
+            <mat-error *ngIf="customerDetailsForm.get('lastName')?.hasError('minlength')">
+              Last name must be at least 2 characters
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Cell Number</mat-label>
+            <input matInput formControlName="cellNumber" placeholder="10-digit cell number">
+            <mat-error *ngIf="customerDetailsForm.get('cellNumber')?.hasError('required')">
+              Cell number is required
+            </mat-error>
+            <mat-error *ngIf="customerDetailsForm.get('cellNumber')?.hasError('pattern')">
+              Cell number must be 10 digits
+            </mat-error>
+          </mat-form-field>
+
+          <div class="checkbox-field">
+            <mat-checkbox formControlName="isCapitecUser">
+              I am a Capitec Client
+            </mat-checkbox>
+            <mat-error *ngIf="customerDetailsForm.get('isCapitecUser')?.hasError('required')">
+              Please indicate if you are a Capitec user
+            </mat-error>
+          </div>
+        </form>
+
+        <div class="step-actions">
+          <button mat-raised-button (click)="goBack()" [disabled]="isLoading">Back</button>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="proceedToAppointmentDetails()"
+            [disabled]="customerDetailsForm.invalid || isLoading">
+            Next: Appointment Details
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Appointment Details -->
+      <div *ngIf="currentStep === 2 && !isLoading" class="step-content">
+        <h2>Select Date & Time</h2>
+
+        <form [formGroup]="appointmentDetailsForm">
+          <!-- Branch Selection -->
+          <div class="form-section">
+            <h3>Select a Branch</h3>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Branch</mat-label>
+              <mat-select formControlName="branch" (selectionChange)="onBranchSelected($event.value)">
+                <mat-option value="">Select a branch</mat-option>
+                <mat-option *ngFor="let branch of branches" [value]="branch">
+                  {{ branch.code }} - {{ branch.address.suburb }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="appointmentDetailsForm.get('branch')?.hasError('required')">
+                Branch is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Date Selection -->
+          <div class="form-section" *ngIf="selectedBranch">
+            <h3>Select a Date</h3>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Date</mat-label>
+              <input
+                matInput
+                [matDatepicker]="picker"
+                formControlName="date"
+                (dateChange)="onDateSelected($event.value)"
+                [min]="minDate">
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-error *ngIf="appointmentDetailsForm.get('date')?.hasError('required')">
+                Date is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Time Slot Selection -->
+          <div class="form-section" *ngIf="selectedDate && availableSlots.length > 0">
+            <h3>Select a Time Slot</h3>
+            <mat-radio-group [(ngModel)]="selectedSlot" formControlName="slot">
+              <mat-radio-button
+                *ngFor="let slot of availableSlots"
+                [value]="slot"
+                (change)="onSlotSelected(slot)"
+                class="radio-option">
+                {{ formatTime(slot.startTime) }} - {{ formatTime(slot.endTime) }}
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <div *ngIf="selectedDate && availableSlots.length === 0" class="empty-state">
+            No available slots for this date. Please select another date.
+          </div>
+        </form>
+
+        <div class="step-actions">
+          <button mat-raised-button (click)="goBack()" [disabled]="isLoading">Back</button>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="proceedToConfirmation()"
+            [disabled]="!selectedSlot || isLoading">
+            Confirm Appointment
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirmation -->
+      <div *ngIf="currentStep === 3" class="step-content">
+        <mat-card class="confirmation-card">
+          <mat-card-header>
+            <mat-card-title>Appointment Confirmed!</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="confirmation-details">
+              <div class="detail-row">
+                <span class="label">Reference Number:</span>
+                <span class="value highlight">{{ appointmentReference }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Date & Time:</span>
+                <span class="value">{{ selectedSlot?.startTime | date: 'medium' }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Branch:</span>
+                <span class="value">{{ selectedBranch?.code }} - {{ selectedBranch?.address?.suburb }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Service:</span>
+                <span class="value">{{ selectedServiceType?.name }}</span>
+              </div>
+              <div class="detail-row" *ngIf="selectedServiceReason">
+                <span class="label">Service Reason:</span>
+                <span class="value">{{ selectedServiceReason.description }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Customer:</span>
+                <span class="value">{{ customerDetailsForm.get('firstName')?.value }} {{ customerDetailsForm.get('lastName')?.value }}</span>
+              </div>
+            </div>
+
+            <div class="confirmation-message">
+              <p>Your appointment has been successfully booked. Please note your reference number for future inquiries.</p>
+              <p>You will receive a confirmation email shortly.</p>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-raised-button color="primary" (click)="resetBooking()">
+              Book Another Appointment
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
