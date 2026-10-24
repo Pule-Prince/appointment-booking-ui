@@ -23,28 +23,42 @@
 
       <!-- Step 0: Service Selection -->
       <div *ngIf="currentStep === 0 && !isLoading" class="step-content">
-        <h2>Select Your Service</h2>
+        <!-- Categories View -->
+        <div class="category-section" *ngIf="currentSubStep === 0">
+          <h2 class="category-heading">What can we help you with?</h2>
+          <p class="category-subtitle">Select a service category to get started.</p>
 
-        <!-- Service Category Selection -->
-        <div class="selection-section">
-          <h3>1. Service Category</h3>
           <div *ngIf="categories.length === 0" class="empty-state">
             No categories available
           </div>
-          <mat-radio-group *ngIf="categories.length > 0" [(ngModel)]="selectedCategory">
-            <mat-radio-button
+
+          <div *ngIf="categories.length > 0" class="categories-grid">
+            <div
               *ngFor="let category of categories"
-              [value]="category"
-              (change)="onCategorySelected(category)"
-              class="radio-option">
-              {{ category.name }}
-            </mat-radio-button>
-          </mat-radio-group>
+              class="category-tile"
+              [class.selected]="selectedCategory?.categoryId === category.categoryId"
+              (click)="onCategorySelected(category)"
+              (keydown.enter)="onCategorySelected(category)"
+              (keydown.space)="onCategorySelected(category)"
+              tabindex="0"
+              role="button">
+              <div class="category-icon">
+                <mat-icon class="category-mat-icon">{{ getCategoryIcon(category.name) }}</mat-icon>
+              </div>
+              <h3 class="category-title">{{ category.name }}</h3>
+              <p class="category-description">{{ getCategoryDescription(category.name) }}</p>
+            </div>
+          </div>
         </div>
 
-        <!-- Product Selection -->
-        <div class="selection-section" *ngIf="selectedCategory && products.length > 0">
-          <h3>2. Product</h3>
+        <!-- Products View -->
+        <div class="selection-section" *ngIf="currentSubStep === 1">
+          <div class="back-header">
+            <button mat-icon-button (click)="goBackInServiceSelection()" class="back-button">
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+            <h3>Select Product</h3>
+          </div>
           <mat-radio-group [(ngModel)]="selectedProduct">
             <mat-radio-button
               *ngFor="let product of products"
@@ -56,9 +70,14 @@
           </mat-radio-group>
         </div>
 
-        <!-- Service Type Selection -->
-        <div class="selection-section" *ngIf="selectedProduct && serviceTypes.length > 0">
-          <h3>3. Service Type</h3>
+        <!-- Service Types View -->
+        <div class="selection-section" *ngIf="currentSubStep === 2">
+          <div class="back-header">
+            <button mat-icon-button (click)="goBackInServiceSelection()" class="back-button">
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+            <h3>Select Service Type</h3>
+          </div>
           <mat-radio-group [(ngModel)]="selectedServiceType">
             <mat-radio-button
               *ngFor="let serviceType of serviceTypes"
@@ -70,9 +89,14 @@
           </mat-radio-group>
         </div>
 
-        <!-- Service Reason Selection (Optional) -->
-        <div class="selection-section" *ngIf="selectedServiceType && serviceReasons.length > 0">
-          <h3>4. Service Reason (Optional)</h3>
+        <!-- Service Reasons View -->
+        <div class="selection-section" *ngIf="currentSubStep === 3">
+          <div class="back-header">
+            <button mat-icon-button (click)="goBackInServiceSelection()" class="back-button">
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+            <h3>Select Service Reason</h3>
+          </div>
           <mat-radio-group [(ngModel)]="selectedServiceReason">
             <mat-radio-button
               *ngFor="let reason of serviceReasons"
@@ -97,7 +121,7 @@
         </div>
 
         <!-- Navigation -->
-        <div class="step-actions">
+        <div class="step-actions" *ngIf="selectedServiceType">
           <button
             mat-raised-button
             color="primary"
@@ -136,13 +160,13 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Cell Number</mat-label>
-            <input matInput formControlName="cellNumber" placeholder="10-digit cell number">
-            <mat-error *ngIf="customerDetailsForm.get('cellNumber')?.hasError('required')">
-              Cell number is required
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" placeholder="Enter your email address" type="email">
+            <mat-error *ngIf="customerDetailsForm.get('email')?.hasError('required')">
+              Email is required
             </mat-error>
-            <mat-error *ngIf="customerDetailsForm.get('cellNumber')?.hasError('pattern')">
-              Cell number must be 10 digits
+            <mat-error *ngIf="customerDetailsForm.get('email')?.hasError('email')">
+              Please enter a valid email address
             </mat-error>
           </mat-form-field>
 
@@ -181,7 +205,7 @@
               <mat-select formControlName="branch" (selectionChange)="onBranchSelected($event.value)">
                 <mat-option value="">Select a branch</mat-option>
                 <mat-option *ngFor="let branch of branches" [value]="branch">
-                  {{ branch.code }} - {{ branch.address.suburb }}
+                  {{ branch.address.addressLine }} - {{ branch.address.suburb }}
                 </mat-option>
               </mat-select>
               <mat-error *ngIf="appointmentDetailsForm.get('branch')?.hasError('required')">
@@ -205,6 +229,9 @@
               <mat-datepicker #picker></mat-datepicker>
               <mat-error *ngIf="appointmentDetailsForm.get('date')?.hasError('required')">
                 Date is required
+              </mat-error>
+              <mat-error *ngIf="appointmentDetailsForm.get('date')?.hasError('pastDate')">
+                Please select a date from tomorrow onwards
               </mat-error>
             </mat-form-field>
           </div>
@@ -244,7 +271,7 @@
       <div *ngIf="currentStep === 3" class="step-content">
         <mat-card class="confirmation-card">
           <mat-card-header>
-            <mat-card-title>Appointment Confirmed!</mat-card-title>
+            <mat-card-title class="booking-confirm">Appointment Confirmed!</mat-card-title>
           </mat-card-header>
           <mat-card-content>
             <div class="confirmation-details">

@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
 
 import { BookingService } from '../../services/booking.service';
 import {
@@ -42,7 +43,8 @@ import {
     MatProgressSpinnerModule,
     MatCardModule,
     MatRadioModule,
-    MatListModule
+    MatListModule,
+    MatIconModule
   ],
   templateUrl: './booking-stepper.component.html',
   styleUrls: ['./booking-stepper.component.css']
@@ -50,6 +52,7 @@ import {
 export class BookingStepperComponent implements OnInit {
   isLinear = true;
   currentStep = 0;
+  currentSubStep = 0; // 0: categories, 1: products, 2: service types, 3: service reasons
   isLoading = false;
   errorMessage = '';
   successMessage = '';
@@ -84,6 +87,19 @@ export class BookingStepperComponent implements OnInit {
     this.minDate.setDate(this.minDate.getDate() + 1);
   }
 
+  futureDateValidator = (control: any) => {
+    if (!control.value) {
+      return null;
+    }
+    const selectedDate = new Date(control.value);
+    selectedDate.setHours(0, 0, 0, 0);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    return selectedDate >= tomorrow ? null : { pastDate: true };
+  }
+
   ngOnInit(): void {
     this.loadCategories();
     this.loadBranches();
@@ -101,13 +117,13 @@ export class BookingStepperComponent implements OnInit {
     this.customerDetailsForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      cellNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      email: ['', [Validators.required, Validators.email]],
       isCapitecUser: [false, Validators.required]
     });
 
     this.appointmentDetailsForm = this.fb.group({
       branch: [null, Validators.required],
-      date: [null, Validators.required],
+      date: [null, [Validators.required, this.futureDateValidator]],
       slot: [null, Validators.required]
     });
   }
@@ -153,6 +169,7 @@ export class BookingStepperComponent implements OnInit {
     this.bookingService.getProductsByCategory(category.categoryId).subscribe({
       next: (data) => {
         this.products = data;
+        this.currentSubStep = 1;
         this.isLoading = false;
       },
       error: (error) => {
@@ -175,6 +192,7 @@ export class BookingStepperComponent implements OnInit {
     this.bookingService.getServiceTypesByProduct(product.productId).subscribe({
       next: (data) => {
         this.serviceTypes = data;
+        this.currentSubStep = 2;
         this.isLoading = false;
       },
       error: (error) => {
@@ -196,6 +214,11 @@ export class BookingStepperComponent implements OnInit {
     this.bookingService.getServiceReasonsByType(serviceType.typeId).subscribe({
       next: (data) => {
         this.serviceReasons = data;
+        if (data.length > 0) {
+          this.currentSubStep = 3;
+        } else {
+          this.proceedToCustomerDetails();
+        }
         this.isLoading = false;
       },
       error: (error) => {
@@ -235,10 +258,17 @@ export class BookingStepperComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const dateStr = date.toISOString().split('T')[0];
-    this.bookingService.getAvailableSlots(this.selectedBranch.id, dateStr).subscribe({
+    // Format date as YYYY-MM-DD using local timezone (not UTC)
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+
+    this.bookingService.getAvailableSlots(this.selectedBranch.branchId, dateStr).subscribe({
       next: (data) => {
-        this.availableSlots = data;
+        this.availableSlots = data.sort((a, b) =>
+          new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+        );
         this.isLoading = false;
         if (data.length === 0) {
           this.errorMessage = 'No available slots for this date';
@@ -294,11 +324,11 @@ export class BookingStepperComponent implements OnInit {
     const request: CreateAppointmentRequest = {
       firstName: this.customerDetailsForm.get('firstName')?.value,
       lastName: this.customerDetailsForm.get('lastName')?.value,
-      cellNumber: this.customerDetailsForm.get('cellNumber')?.value,
+      email: this.customerDetailsForm.get('email')?.value,
       isCapitecUser: this.customerDetailsForm.get('isCapitecUser')?.value,
       serviceTypeId: this.selectedServiceType!.typeId,
       serviceReasonId: this.selectedServiceReason?.reasonId || null,
-      slotId: this.selectedSlot!.id
+      slotId: this.selectedSlot!.slotId
     };
 
     this.bookingService.createAppointment(request).subscribe({
@@ -337,5 +367,41 @@ export class BookingStepperComponent implements OnInit {
   formatTime(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  getCategoryIcon(categoryName: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Insure': 'verified',
+      'Transact': 'account_balance',
+      'Credit': 'credit_card',
+      'Save': 'savings',
+      'Business Inquiry': 'business'
+    };
+    return iconMap[categoryName] || 'help';
+  }
+
+  getCategoryDescription(categoryName: string): string {
+    const descriptionMap: { [key: string]: string } = {
+      'Insure': 'Life and funeral cover',
+      'Transact': 'Account and transaction queries',
+      'Credit': 'Credit products and applications',
+      'Save': 'Savings products and queries',
+      'Business Inquiry': 'Business banking assistance'
+    };
+    return descriptionMap[categoryName] || '';
+  }
+
+  goBackInServiceSelection(): void {
+    if (this.currentSubStep === 3) {
+      this.currentSubStep = 2;
+      this.selectedServiceReason = null;
+    } else if (this.currentSubStep === 2) {
+      this.currentSubStep = 1;
+      this.selectedServiceType = null;
+    } else if (this.currentSubStep === 1) {
+      this.currentSubStep = 0;
+      this.selectedProduct = null;
+    }
+    this.errorMessage = '';
   }
 }

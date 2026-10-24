@@ -26,14 +26,14 @@ export interface Address {
 }
 
 export interface Branch {
-  id: number;
+  branchId: number;
   code: string;
   active: boolean;
   address: Address;
 }
 
 export interface AppointmentSlot {
-  id: number;
+  slotId: number;
   branch: Branch;
   startTime: string;
   endTime: string;
@@ -45,14 +45,14 @@ export interface Customer {
   id?: number;
   firstName: string;
   lastName: string;
-  cellNumber: string;
+  email: string;
   isCapitecUser: boolean;
 }
 
 export interface CreateAppointmentRequest {
   firstName: string;
   lastName: string;
-  cellNumber: string;
+  email: string;
   isCapitecUser: boolean;
   serviceTypeId: number;
   serviceReasonId: number | null;

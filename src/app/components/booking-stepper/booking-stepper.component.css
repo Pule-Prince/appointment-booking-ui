@@ -331,3 +331,147 @@ mat-card-actions button {
 ::ng-deep .mdc-text-field--filled {
   background-color: var(--capitec-light-gray);
 }
+
+/* Category Section Styles */
+.category-section {
+  margin-bottom: 2rem;
+}
+
+.category-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--capitec-dark-gray);
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+.category-subtitle {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.category-tile {
+  background: var(--capitec-white);
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  outline: none;
+}
+
+.category-tile:hover {
+  border-color: var(--capitec-blue);
+  box-shadow: 0 4px 12px rgba(0, 72, 109, 0.15);
+  transform: translateY(-2px);
+}
+
+.category-tile:focus {
+  outline: 2px solid var(--capitec-blue);
+  outline-offset: 2px;
+}
+
+.category-tile.selected {
+  border-color: var(--capitec-blue);
+  background: #f0f5f9;
+  box-shadow: 0 4px 12px rgba(0, 72, 109, 0.2);
+}
+
+.category-tile.selected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background-color: var(--capitec-blue);
+  border-radius: 12px 12px 0 0;
+}
+
+.category-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.category-icon mat-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  color: var(--capitec-red);
+}
+
+.category-tile.selected .category-icon mat-icon {
+  color: var(--capitec-red);
+}
+
+.category-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--capitec-dark-gray);
+  margin: 0 0 0.5rem 0;
+}
+
+.category-description {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Responsive Design for Categories */
+@media (max-width: 600px) {
+  .categories-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .category-heading {
+    font-size: 1.5rem;
+  }
+
+  .category-tile {
+    padding: 1.25rem;
+  }
+}
+
+/* Back Button Styles */
+.back-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.back-button {
+  color: var(--capitec-blue);
+  flex-shrink: 0;
+}
+
+.back-button:hover {
+  background-color: rgba(0, 72, 109, 0.1);
+}
+
+.back-header h3 {
+  margin: 0;
+  color: var(--capitec-dark-gray);
+  font-size: 1rem;
+  font-weight: 600;
+}
