@@ -89,23 +89,23 @@
           </mat-radio-group>
         </div>
 
-        <!-- Service Reasons View -->
-        <div class="selection-section" *ngIf="currentSubStep === 3">
-          <div class="back-header">
-            <button mat-icon-button (click)="goBackInServiceSelection()" class="back-button">
-              <mat-icon>arrow_back</mat-icon>
-            </button>
-            <h3>Select Service Reason</h3>
-          </div>
-          <mat-radio-group [(ngModel)]="selectedServiceReason">
-            <mat-radio-button
-              *ngFor="let reason of serviceReasons"
-              [value]="reason"
-              (change)="onServiceReasonSelected(reason)"
-              class="radio-option">
-              {{ reason.description }}
-            </mat-radio-button>
-          </mat-radio-group>
+        <!-- Service Reason Text Input -->
+        <div class="selection-section" *ngIf="currentSubStep === 2">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Service Reason</mat-label>
+            <textarea matInput
+              [(ngModel)]="selectedServiceReason"
+              placeholder="Enter your service reason (up to 200 characters)"
+              maxlength="200"
+              rows="3"></textarea>
+            <mat-hint align="end">{{ selectedServiceReason.length || 0 }}/200</mat-hint>
+            <mat-error *ngIf="serviceSelectionForm.get('serviceReason')?.hasError('required')">
+              Service reason is required
+            </mat-error>
+            <mat-error *ngIf="serviceSelectionForm.get('serviceReason')?.hasError('maxlength')">
+              Service reason cannot exceed 200 characters
+            </mat-error>
+          </mat-form-field>
         </div>
 
         <!-- Document Guidance -->
@@ -293,7 +293,7 @@
               </div>
               <div class="detail-row" *ngIf="selectedServiceReason">
                 <span class="label">Service Reason:</span>
-                <span class="value">{{ selectedServiceReason.description }}</span>
+                <span class="value">{{ selectedServiceReason }}</span>
               </div>
               <div class="detail-row">
                 <span class="label">Customer:</span>
@@ -313,6 +313,52 @@
           </mat-card-actions>
         </mat-card>
       </div>
+
+      <!-- Cancel Appointment Section -->
+      <mat-card class="cancel-card" *ngIf="currentStep === 0">
+        <mat-card-content>
+          <div class="cancel-section">
+            <button
+              mat-raised-button
+              color="warn"
+              (click)="toggleCancelForm()"
+              class="cancel-appointment-btn"
+              [disabled]="isLoading">
+              Cancel Appointment
+            </button>
+
+            <div *ngIf="showCancelForm" class="cancel-form-container">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Reference Number</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="cancelReferenceNumber"
+                  placeholder="Enter your appointment reference number"
+                  [disabled]="isLoading">
+                <mat-error *ngIf="!cancelReferenceNumber">
+                  Reference number is required
+                </mat-error>
+              </mat-form-field>
+
+              <div class="cancel-actions">
+                <button
+                  mat-raised-button
+                  (click)="toggleCancelForm()"
+                  [disabled]="isLoading">
+                  Close
+                </button>
+                <button
+                  mat-raised-button
+                  color="warn"
+                  (click)="performCancelAppointment()"
+                  [disabled]="!cancelReferenceNumber.trim() || isLoading">
+                  Cancel Appointment
+                </button>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </mat-card-content>
   </mat-card>
 </div>

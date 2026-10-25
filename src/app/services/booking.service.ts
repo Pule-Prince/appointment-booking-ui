@@ -63,4 +63,10 @@ export class BookingService {
   cancelAppointment(referenceNumber: string): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/appointments/${referenceNumber}/cancel`, {});
   }
+
+  getAppointmentsByDate(date: string): Observable<AppointmentResponse[]> {
+    return this.http.get<AppointmentResponse[]>(`${this.apiUrl}/appointments`, {
+      params: { date }
+    });
+  }
 }

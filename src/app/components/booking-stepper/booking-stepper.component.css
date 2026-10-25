@@ -1,5 +1,5 @@
 :host {
-  --capitec-blue: #00486D;
+  --capitec-blue: #004c6d;
   --capitec-red: #E63934;
   --capitec-white: #FFFFFF;
   --capitec-light-gray: #F5F5F5;
@@ -474,4 +474,88 @@ mat-card-actions button {
   color: var(--capitec-dark-gray);
   font-size: 1rem;
   font-weight: 600;
+}
+
+/* Cancel Appointment Card */
+.cancel-card {
+  margin-top: 2rem;
+  border-top: 3px solid var(--capitec-red);
+  background-color: #fafafa;
+}
+
+.cancel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cancel-appointment-btn {
+  background-color: var(--capitec-red) !important;
+  color: var(--capitec-white) !important;
+  min-width: 180px;
+  padding: 0.75rem 2rem !important;
+  font-weight: 600;
+  align-self: flex-end;
+}
+
+.cancel-appointment-btn:hover:not(:disabled) {
+  background-color: #d32f2f !important;
+  box-shadow: 0 4px 12px rgba(230, 57, 52, 0.3) !important;
+}
+
+.cancel-form-container {
+  background: var(--capitec-white);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cancel-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.cancel-actions button {
+  min-width: 140px;
+}
+
+button[color='warn'] {
+  background-color: var(--capitec-red) !important;
+  color: var(--capitec-white) !important;
+}
+
+button[color='warn']:hover:not(:disabled) {
+  background-color: #d32f2f !important;
+}
+
+/* Responsive for Cancel Section */
+@media (max-width: 600px) {
+  .cancel-appointment-btn {
+    align-self: stretch;
+    width: 100%;
+  }
+
+  .cancel-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-actions button {
+    width: 100%;
+    min-width: unset;
+  }
 }

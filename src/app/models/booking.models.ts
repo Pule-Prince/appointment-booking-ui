@@ -55,7 +55,7 @@ export interface CreateAppointmentRequest {
   email: string;
   isCapitecUser: boolean;
   serviceTypeId: number;
-  serviceReasonId: number | null;
+  serviceReason: string;
   slotId: number;
 }
 

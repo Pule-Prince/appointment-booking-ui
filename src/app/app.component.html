@@ -1,1 +1,18 @@
-<!-- Booking Application -->
+<mat-toolbar class="app-toolbar">
+  <div class="toolbar-brand">
+    <span class="app-title">Capitec Appointment Booking</span>
+  </div>
+  <div class="toolbar-spacer"></div>
+  <nav class="toolbar-nav">
+    <button mat-button routerLink="/book" routerLinkActive="active" class="nav-link">
+      <mat-icon>add_circle</mat-icon>
+      Book Appointment
+    </button>
+    <button mat-button routerLink="/appointments" routerLinkActive="active" class="nav-link">
+      <mat-icon>calendar_today</mat-icon>
+      View Appointments
+    </button>
+  </nav>
+</mat-toolbar>
+
+<router-outlet></router-outlet>

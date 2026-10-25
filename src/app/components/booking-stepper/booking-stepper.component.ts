@@ -67,7 +67,6 @@ export class BookingStepperComponent implements OnInit {
   categories: ServiceCategory[] = [];
   products: Product[] = [];
   serviceTypes: ServiceType[] = [];
-  serviceReasons: ServiceReason[] = [];
   branches: Branch[] = [];
   availableSlots: AppointmentSlot[] = [];
   documentGuidance: string = '';
@@ -76,12 +75,17 @@ export class BookingStepperComponent implements OnInit {
   selectedCategory: ServiceCategory | null = null;
   selectedProduct: Product | null = null;
   selectedServiceType: ServiceType | null = null;
-  selectedServiceReason: ServiceReason | null = null;
+  selectedServiceReason: string = '';
   selectedBranch: Branch | null = null;
   selectedDate: Date | null = null;
   selectedSlot: AppointmentSlot | null = null;
 
   minDate = new Date();
+
+  // Cancel appointment properties
+  showCancelForm = false;
+  cancelReferenceNumber = '';
+  cancelForm!: FormGroup;
 
   constructor(private fb: FormBuilder, private bookingService: BookingService) {
     this.minDate.setDate(this.minDate.getDate() + 1);
@@ -111,7 +115,7 @@ export class BookingStepperComponent implements OnInit {
       category: [null, Validators.required],
       product: [null, Validators.required],
       serviceType: [null, Validators.required],
-      serviceReason: [null]
+      serviceReason: ['', [Validators.required, Validators.maxLength(200)]]
     });
 
     this.customerDetailsForm = this.fb.group({
@@ -125,6 +129,10 @@ export class BookingStepperComponent implements OnInit {
       branch: [null, Validators.required],
       date: [null, [Validators.required, this.futureDateValidator]],
       slot: [null, Validators.required]
+    });
+
+    this.cancelForm = this.fb.group({
+      referenceNumber: ['', [Validators.required, Validators.minLength(1)]]
     });
   }
 
@@ -158,10 +166,9 @@ export class BookingStepperComponent implements OnInit {
     this.selectedCategory = category;
     this.selectedProduct = null;
     this.selectedServiceType = null;
-    this.selectedServiceReason = null;
+    this.selectedServiceReason = '';
     this.products = [];
     this.serviceTypes = [];
-    this.serviceReasons = [];
     this.documentGuidance = '';
 
     this.isLoading = true;
@@ -182,9 +189,8 @@ export class BookingStepperComponent implements OnInit {
   onProductSelected(product: Product): void {
     this.selectedProduct = product;
     this.selectedServiceType = null;
-    this.selectedServiceReason = null;
+    this.selectedServiceReason = '';
     this.serviceTypes = [];
-    this.serviceReasons = [];
     this.documentGuidance = '';
 
     this.isLoading = true;
@@ -204,28 +210,10 @@ export class BookingStepperComponent implements OnInit {
 
   onServiceTypeSelected(serviceType: ServiceType): void {
     this.selectedServiceType = serviceType;
-    this.selectedServiceReason = null;
-    this.serviceReasons = [];
-    this.documentGuidance = '';
+    this.selectedServiceReason = '';
 
     this.isLoading = true;
     this.errorMessage = '';
-
-    this.bookingService.getServiceReasonsByType(serviceType.typeId).subscribe({
-      next: (data) => {
-        this.serviceReasons = data;
-        if (data.length > 0) {
-          this.currentSubStep = 3;
-        } else {
-          this.proceedToCustomerDetails();
-        }
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.errorMessage = 'Failed to load service reasons';
-        this.isLoading = false;
-      }
-    });
 
     this.bookingService.getDocumentGuidance(serviceType.typeId).subscribe({
       next: (data) => {
@@ -235,10 +223,8 @@ export class BookingStepperComponent implements OnInit {
         // Guidance is optional
       }
     });
-  }
 
-  onServiceReasonSelected(reason: ServiceReason): void {
-    this.selectedServiceReason = reason;
+    this.isLoading = false;
   }
 
   onBranchSelected(branch: Branch): void {
@@ -286,7 +272,7 @@ export class BookingStepperComponent implements OnInit {
   }
 
   proceedToCustomerDetails(): void {
-    if (!this.selectedServiceType || (this.serviceReasons.length > 0 && !this.selectedServiceReason)) {
+    if (!this.selectedServiceType || !this.selectedServiceReason) {
       this.errorMessage = 'Please select all required service information';
       return;
     }
@@ -327,7 +313,7 @@ export class BookingStepperComponent implements OnInit {
       email: this.customerDetailsForm.get('email')?.value,
       isCapitecUser: this.customerDetailsForm.get('isCapitecUser')?.value,
       serviceTypeId: this.selectedServiceType!.typeId,
-      serviceReasonId: this.selectedServiceReason?.reasonId || null,
+      serviceReason: this.selectedServiceReason,
       slotId: this.selectedSlot!.slotId
     };
 
@@ -346,10 +332,11 @@ export class BookingStepperComponent implements OnInit {
 
   resetBooking(): void {
     this.currentStep = 0;
+    this.currentSubStep = 0;
     this.selectedCategory = null;
     this.selectedProduct = null;
     this.selectedServiceType = null;
-    this.selectedServiceReason = null;
+    this.selectedServiceReason = '';
     this.selectedBranch = null;
     this.selectedDate = null;
     this.selectedSlot = null;
@@ -392,10 +379,7 @@ export class BookingStepperComponent implements OnInit {
   }
 
   goBackInServiceSelection(): void {
-    if (this.currentSubStep === 3) {
-      this.currentSubStep = 2;
-      this.selectedServiceReason = null;
-    } else if (this.currentSubStep === 2) {
+    if (this.currentSubStep === 2) {
       this.currentSubStep = 1;
       this.selectedServiceType = null;
     } else if (this.currentSubStep === 1) {
@@ -403,5 +387,38 @@ export class BookingStepperComponent implements OnInit {
       this.selectedProduct = null;
     }
     this.errorMessage = '';
+  }
+
+  toggleCancelForm(): void {
+    this.showCancelForm = !this.showCancelForm;
+    this.cancelReferenceNumber = '';
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  performCancelAppointment(): void {
+    if (!this.cancelReferenceNumber.trim()) {
+      this.errorMessage = 'Please enter a reference number';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.bookingService.cancelAppointment(this.cancelReferenceNumber).subscribe({
+      next: (response) => {
+        this.successMessage = 'Appointment cancelled successfully. Returning to home...';
+        this.isLoading = false;
+
+        setTimeout(() => {
+          this.resetBooking();
+          this.showCancelForm = false;
+        }, 2000);
+      },
+      error: (error) => {
+        this.errorMessage = error.error?.message || 'Failed to cancel appointment. Please check the reference number and try again.';
+        this.isLoading = false;
+      }
+    });
   }
 }
