@@ -1,59 +1,84 @@
-# AppointmentBookingUi
+# Capitec Appointment Booking System - Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.25.
+## Overview
 
-## Development server
+Angular 19 project for booking and managing appointments with real-time slot availability, form validation, and email confirmations.
 
-To start a local development server, run:
+---
+
+## Quick Start
+
+### Clone Repository
+```bash
+git clone https://github.com/Pule-Prince/appointment-booking-ui.git
+cd into the directory where you cloned the project
+```
+
+### Environment Requirements
+
+**Required:**
+- Node.js 20.18.0+
+- npm 10.8.2+
+- Angular 19.2.25
+
+**Verify:**
+```command
+node --version
+npm --version
+```
+
+---
+
+## Setup Project
+
+### Install Dependencies (node modules)
+```bash
+npm install
+```
+
+---
+
+## Running the Development Server
 
 ```bash
+# Start development server
 ng serve
+
+# Or
+npm start
+
+# Application runs on: http://localhost:4200
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+**Auto-reload:** Changes are automatically reflected in the browser.
 
-## Code scaffolding
+## Technology Stack
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **Angular 19** - Framework
+- **TypeScript 5+** - Language
+- **Angular Material 19.2.0** - UI Components
+- **RxJS 7+** - Reactive Programming
+- **Reactive Forms** - Form Management
 
-```bash
-ng generate component component-name
+---
+
+## Project Structure
+
+```
+src/app/
+├── components/
+│   ├── booking-stepper/           # Booking workflow
+│   └── appointments-dashboard/    # Appointment lookup
+├── services/
+│   ├── booking.service.ts
+│   ├── branch.service.ts
+│   └── service-catalog.service.ts
+├── models/
+│   └── booking.models.ts
+└── app.component.ts
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
+**Application runs on browser:**
 ```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
+http://localhost:4200
 ```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
