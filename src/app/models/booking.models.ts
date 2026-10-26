@@ -39,12 +39,12 @@ export interface Branch {
 }
 
 export interface AppointmentSlot {
-  slotId: number;
   branch: Branch;
   startTime: string;
   endTime: string;
   capacity: number;
   bookedCount: number;
+  timeSlotId: number;
 }
 
 export interface Customer {
@@ -62,7 +62,9 @@ export interface CreateAppointmentRequest {
   isCapitecUser: boolean;
   serviceTypeId: number;
   serviceReason: string;
-  slotId: number;
+  branchId: number;
+  appointmentDate: string;
+  timeSlotId: number;
 }
 
 export interface AppointmentResponse {

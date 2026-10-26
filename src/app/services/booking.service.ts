@@ -38,10 +38,6 @@ export class BookingService {
     return this.http.get<ServiceReason[]>(`${this.apiUrl}/service-types/${serviceTypeId}/reasons`);
   }
 
-  getDocumentGuidance(serviceTypeId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/service-types/${serviceTypeId}/guidance`);
-  }
-
   getBranches(): Observable<Branch[]> {
     return this.http.get<Branch[]>(`${this.apiUrl}/branches`);
   }

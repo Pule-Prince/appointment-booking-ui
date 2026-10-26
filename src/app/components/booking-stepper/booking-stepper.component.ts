@@ -70,7 +70,6 @@ export class BookingStepperComponent implements OnInit {
   serviceTypes: ServiceType[] = [];
   branches: Branch[] = [];
   availableSlots: AppointmentSlot[] = [];
-  documentGuidance: string = '';
   requiredDocuments: DocumentRequirement[] = [];
 
   // Selection state
@@ -171,7 +170,6 @@ export class BookingStepperComponent implements OnInit {
     this.selectedServiceReason = '';
     this.products = [];
     this.serviceTypes = [];
-    this.documentGuidance = '';
 
     this.isLoading = true;
     this.errorMessage = '';
@@ -193,7 +191,6 @@ export class BookingStepperComponent implements OnInit {
     this.selectedServiceType = null;
     this.selectedServiceReason = '';
     this.serviceTypes = [];
-    this.documentGuidance = '';
 
     this.isLoading = true;
     this.errorMessage = '';
@@ -223,15 +220,6 @@ export class BookingStepperComponent implements OnInit {
       },
       error: (error) => {
         this.requiredDocuments = [];
-      }
-    });
-
-    this.bookingService.getDocumentGuidance(serviceType.typeId).subscribe({
-      next: (data) => {
-        this.documentGuidance = data?.guidance || '';
-      },
-      error: (error) => {
-        // Guidance is optional
       }
     });
 
@@ -318,6 +306,12 @@ export class BookingStepperComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
+    // Format date as local date (YYYY-MM-DD) - avoid timezone shifts
+    const year = this.selectedDate!.getFullYear();
+    const month = String(this.selectedDate!.getMonth() + 1).padStart(2, '0');
+    const day = String(this.selectedDate!.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+
     const request: CreateAppointmentRequest = {
       firstName: this.customerDetailsForm.get('firstName')?.value,
       lastName: this.customerDetailsForm.get('lastName')?.value,
@@ -325,7 +319,9 @@ export class BookingStepperComponent implements OnInit {
       isCapitecUser: this.customerDetailsForm.get('isCapitecUser')?.value,
       serviceTypeId: this.selectedServiceType!.typeId,
       serviceReason: this.selectedServiceReason,
-      slotId: this.selectedSlot!.slotId
+      branchId: this.selectedBranch!.branchId,
+      appointmentDate: dateStr,
+      timeSlotId: this.selectedSlot!.timeSlotId
     };
 
     this.bookingService.createAppointment(request).subscribe({
