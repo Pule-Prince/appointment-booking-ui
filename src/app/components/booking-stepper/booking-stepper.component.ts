@@ -20,6 +20,7 @@ import {
   Product,
   ServiceType,
   ServiceReason,
+  DocumentRequirement,
   Branch,
   AppointmentSlot,
   CreateAppointmentRequest,
@@ -70,6 +71,7 @@ export class BookingStepperComponent implements OnInit {
   branches: Branch[] = [];
   availableSlots: AppointmentSlot[] = [];
   documentGuidance: string = '';
+  requiredDocuments: DocumentRequirement[] = [];
 
   // Selection state
   selectedCategory: ServiceCategory | null = null;
@@ -214,6 +216,15 @@ export class BookingStepperComponent implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
+
+    this.bookingService.getDocumentRequirements(serviceType.typeId).subscribe({
+      next: (data) => {
+        this.requiredDocuments = data || [];
+      },
+      error: (error) => {
+        this.requiredDocuments = [];
+      }
+    });
 
     this.bookingService.getDocumentGuidance(serviceType.typeId).subscribe({
       next: (data) => {

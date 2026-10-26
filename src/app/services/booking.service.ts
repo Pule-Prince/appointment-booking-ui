@@ -7,6 +7,7 @@ import {
   Product,
   ServiceType,
   ServiceReason,
+  DocumentRequirement,
   Branch,
   AppointmentSlot,
   CreateAppointmentRequest,
@@ -68,5 +69,11 @@ export class BookingService {
     return this.http.get<AppointmentResponse[]>(`${this.apiUrl}/appointments`, {
       params: { date }
     });
+  }
+
+  getDocumentRequirements(serviceTypeId: number): Observable<DocumentRequirement[]> {
+    return this.http.get<DocumentRequirement[]>(
+      `${this.apiUrl}/service-types/${serviceTypeId}/documents`
+    );
   }
 }

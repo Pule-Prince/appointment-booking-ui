@@ -44,6 +44,7 @@ export class AppointmentsDashboardComponent implements OnInit {
   displayedColumns: string[] = ['referenceNumber', 'customerName', 'serviceType', 'dateTime', 'branch', 'status'];
 
   selectedDate: Date | null = null;
+  selectedBranchCode: string = '';
   minDate = new Date(new Date().setFullYear(new Date().getFullYear() - 1));
   maxDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 
@@ -88,7 +89,48 @@ export class AppointmentsDashboardComponent implements OnInit {
 
   onDateChange(date: Date): void {
     this.selectedDate = date;
-    this.loadAppointmentsByDate(date);
+    this.loadAppointmentsByDateAndBranch();
+  }
+
+  onBranchCodeChange(): void {
+    if (this.selectedDate) {
+      this.loadAppointmentsByDateAndBranch();
+    }
+  }
+
+  loadAppointmentsByDateAndBranch(): void {
+    if (!this.selectedDate) return;
+
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    const year = this.selectedDate.getFullYear();
+    const month = String(this.selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(this.selectedDate.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+
+    this.bookingService.getAppointmentsByDate(dateStr).subscribe({
+      next: (data) => {
+        // Filter by branch code if provided
+        if (this.selectedBranchCode.trim()) {
+          this.appointments = data.filter(apt =>
+            apt.slot.branch.code.toUpperCase() === this.selectedBranchCode.toUpperCase()
+          );
+        } else {
+          this.appointments = data;
+        }
+        this.isLoading = false;
+        if (this.appointments.length === 0) {
+          this.successMessage = `No appointments found for ${dateStr}` +
+            (this.selectedBranchCode ? ` at branch ${this.selectedBranchCode}` : '');
+        }
+      },
+      error: (error) => {
+        this.errorMessage = 'Failed to load appointments. Please try again.';
+        this.isLoading = false;
+      }
+    });
   }
 
   searchAppointment(): void {

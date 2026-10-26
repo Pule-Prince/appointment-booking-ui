@@ -18,6 +18,12 @@ export interface ServiceReason {
   description: string;
 }
 
+export interface DocumentRequirement {
+  id: number;
+  documentName: string;
+  description: string;
+}
+
 export interface Address {
   id: number;
   addressLine: string;
@@ -68,4 +74,5 @@ export interface AppointmentResponse {
   slot: AppointmentSlot;
   status: string;
   createdAt: string;
+  requiredDocuments?: DocumentRequirement[];
 }

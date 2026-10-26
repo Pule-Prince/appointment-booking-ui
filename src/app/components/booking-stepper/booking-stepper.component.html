@@ -2,7 +2,6 @@
   <mat-card class="booking-card">
     <mat-card-header>
       <mat-card-title>Book Your Appointment</mat-card-title>
-      <mat-card-subtitle>Step {{ currentStep + 1 }} of 4</mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
@@ -108,17 +107,6 @@
           </mat-form-field>
         </div>
 
-        <!-- Document Guidance -->
-        <div class="guidance-section" *ngIf="documentGuidance">
-          <mat-card class="guidance-card">
-            <mat-card-header>
-              <mat-card-title>Required Documents</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              {{ documentGuidance }}
-            </mat-card-content>
-          </mat-card>
-        </div>
 
         <!-- Navigation -->
         <div class="step-actions" *ngIf="selectedServiceType">
@@ -299,6 +287,17 @@
                 <span class="label">Customer:</span>
                 <span class="value">{{ customerDetailsForm.get('firstName')?.value }} {{ customerDetailsForm.get('lastName')?.value }}</span>
               </div>
+            </div>
+
+            <!-- Required Documents Section -->
+            <div class="required-documents-section" *ngIf="requiredDocuments.length > 0">
+              <h3 class="documents-title">Required Documents to Bring:</h3>
+              <ul class="documents-list">
+                <li *ngFor="let doc of requiredDocuments" class="document-item">
+                  <span class="document-name">{{ doc.documentName }}</span>
+                  <span class="document-description" *ngIf="doc.description"> — {{ doc.description }}</span>
+                </li>
+              </ul>
             </div>
 
             <div class="confirmation-message">
