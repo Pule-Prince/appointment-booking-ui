@@ -64,6 +64,9 @@ npm start
 ---
 
 **Application runs on browser:**
-```
+
 http://localhost:4200
-```
+
+**We also have a route for consultants at the branch to view appointments**
+
+http://localhost:4200/appointments
