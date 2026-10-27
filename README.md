@@ -70,3 +70,34 @@ http://localhost:4200
 **We also have a route for consultants at the branch to view appointments**
 
 http://localhost:4200/appointments
+
+## Snippet Screenshots:
+
+**Choose Service Category**
+<img width="1507" height="837" alt="image" src="https://github.com/user-attachments/assets/6bbf7bfd-2c6e-46da-9de7-5cb03be0c054" />
+
+**Choose Product**
+<img width="1512" height="693" alt="image" src="https://github.com/user-attachments/assets/265fde56-d18c-4c09-bbb9-a160804c51da" />
+
+**Choose Service Type**
+<img width="1483" height="824" alt="image" src="https://github.com/user-attachments/assets/11395784-e935-4386-8861-49e09b83e546" />
+
+**Enter Client Details**
+<img width="1476" height="808" alt="image" src="https://github.com/user-attachments/assets/2034e17b-ce10-4528-b0e9-b639e63e6887" />
+
+**Select Preferred Branch and Date and Time**
+<img width="1491" height="809" alt="image" src="https://github.com/user-attachments/assets/2bc0681d-5413-4068-8807-b89d8f2fb747" />
+
+**Appointment Confirmed**
+<img width="1489" height="831" alt="image" src="https://github.com/user-attachments/assets/4b169656-bca5-48d4-bdcc-b36098b93cca" />
+
+**Simulate Email Notification**
+<img width="1484" height="349" alt="image" src="https://github.com/user-attachments/assets/a9824fd7-0bb7-4f64-bde0-3237ff9a292a" />
+
+<img width="1493" height="578" alt="image" src="https://github.com/user-attachments/assets/380cd6fa-1e86-49a4-b5e8-7df8e96f1c75" />
+
+**Consultants View Appointments**
+<img width="1496" height="814" alt="image" src="https://github.com/user-attachments/assets/78a34b31-589a-449b-8d2b-b4305f75bb41" />
+
+
+
