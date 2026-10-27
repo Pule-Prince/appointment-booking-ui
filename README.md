@@ -99,5 +99,8 @@ http://localhost:4200/appointments
 **Consultants View Appointments**
 <img width="1496" height="814" alt="image" src="https://github.com/user-attachments/assets/78a34b31-589a-449b-8d2b-b4305f75bb41" />
 
+**Cancel Appointment**
+<img width="1488" height="759" alt="image" src="https://github.com/user-attachments/assets/a952c2f7-fd28-42df-a6bb-21a6b93e68c0" />
 
-
+**View Status of Appointments**
+<img width="1472" height="801" alt="image" src="https://github.com/user-attachments/assets/1362ec13-b2d4-431c-912f-35ab04e2e2a1" />
