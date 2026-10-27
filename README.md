@@ -10,8 +10,9 @@ Angular 19 project for booking and managing appointments with real-time slot ava
 
 ### Clone Repository
 ```bash
-git clone https://github.com/Pule-Prince/appointment-booking-ui.git
-cd into the directory where you cloned the project
+- git clone https://github.com/Pule-Prince/appointment-booking-ui.git
+- cd into the directory where you cloned the project
+- Use Visual Studio Code or IntelliJ
 ```
 
 ### Environment Requirements
@@ -61,22 +62,6 @@ npm start
 - **Reactive Forms** - Form Management
 
 ---
-
-## Project Structure
-
-```
-src/app/
-├── components/
-│   ├── booking-stepper/           # Booking workflow
-│   └── appointments-dashboard/    # Appointment lookup
-├── services/
-│   ├── booking.service.ts
-│   ├── branch.service.ts
-│   └── service-catalog.service.ts
-├── models/
-│   └── booking.models.ts
-└── app.component.ts
-```
 
 **Application runs on browser:**
 ```
